@@ -57,7 +57,3 @@ FCFS
 - matplotlib
 - numpy
 
-## Integrantes
-
-- Maria Luisa Sanches
-- Pedro Prado
