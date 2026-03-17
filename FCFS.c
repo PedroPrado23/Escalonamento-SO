@@ -50,9 +50,9 @@ int main(int argc, char *argv[]){
         scanf("%d", &prioridade[i]);
     }
     
-    FILE *arq = fopen("1.out", "w");
+    FILE *arq = fopen("2.out", "w");
     if(arq == NULL){
-        printf("Erro ao criar o arquivo!\n");
+        printf("Erro ao criar o xarquivo!\n");
         return -1;
     }
 
