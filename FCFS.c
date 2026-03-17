@@ -1,3 +1,5 @@
+// Executar windows: Get-Content ./1.in | fcfs.exe ./1.out
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -27,60 +29,77 @@ void imprimirFila(Fila *f);
 void destruirFila(Fila *f);
 
 int main(int argc, char *argv[]){
+
     Fila f;
     f.ini = f.fim = NULL;
     f.num_elems = 0;
-    int numTarefas;
+    
+    int linha = 0, pos = 0, secao = 1, valor, numTarefas;
     
     scanf("%d", &numTarefas);
+    linha++;
 
     int *ingresso = malloc(numTarefas * sizeof(int));
     int *duracao  = malloc(numTarefas * sizeof(int));
     int *prioridade = malloc(numTarefas * sizeof(int));
 
-    for(int i = 0; i < numTarefas; i++) {
-        scanf("%d", &ingresso[i]);
+    secao++; 
+
+    while (scanf("%d", &valor) != EOF) {      
+        
+        if (secao == 2) ingresso[pos++] = valor;     
+        if (secao == 3) duracao[pos++] = valor;       
+        if (secao == 4) prioridade[pos++] = valor;        
+            
+        if (linha % numTarefas == 0)  {
+            switch(secao) {
+                case 2:
+                    pos = 0;
+                break;              
+                case 3:
+                    pos = 0;
+                break;
+                case 4:
+                    pos = 0;
+                break;              
+            }
+            secao++; 
+        }
+        
+        linha++;
     }
-    
-    for(int i = 0; i < numTarefas; i++) {
-        scanf("%d", &duracao[i]);
-    }
-    
-    for(int i = 0; i < numTarefas; i++) {
-        scanf("%d", &prioridade[i]);
-    }
-    
-    FILE *arq = fopen("2.out", "w");
+
+    FILE *arq = fopen(argv[1], "w");
     if(arq == NULL){
-        printf("Erro ao criar o xarquivo!\n");
+        printf("Erro ao criar o arquivo!\n");
+        free(ingresso); free(duracao); free(prioridade);
         return -1;
     }
 
-    if(arq){
-        fprintf(arq, "%s", "FCFS\n");
-        fprintf(arq, "%d\n", numTarefas);
+    fprintf(arq, "%s", "FCFS\n");
+    fprintf(arq, "%d\n", numTarefas);
 
-        for(int i = 0; i < numTarefas; i++){
-            fprintf(arq, "%d\n", ingresso[i]);
-        }
-
-        int tempo = 0;
-        int concluidas = 0;
-        int *restante = malloc(numTarefas *sizeof(int));
-    
-        for(int i = 0; i < numTarefas; i++){
-            restante[i] = duracao[i];
+    for(int i = 0; i < numTarefas; i++){
+        fprintf(arq, "%d\n", ingresso[i]);
     }
-    
+
+    int tempo = 0;
+    int concluidas = 0;
+    int *restante = malloc(numTarefas * sizeof(int));
+
+    for(int i = 0; i < numTarefas; i++){
+        restante[i] = duracao[i];
+    }
+
     while(concluidas < numTarefas){
         for(int i = 0; i < numTarefas; i++){
             if(ingresso[i] == tempo)
-            enfileirar(&f, i);
-    }
-    
-    if(f.ini != NULL){
-        int idx = f.ini->info;
-        fprintf(arq, "%d\n", idx + 1);
+                enfileirar(&f, i);
+        }
+
+        if(f.ini != NULL){
+            int idx = f.ini->info;
+            fprintf(arq, "%d\n", idx + 1);
             restante[idx]--;
             
             if(restante[idx] == 0){
@@ -94,16 +113,14 @@ int main(int argc, char *argv[]){
         tempo++;
     }
 
-        fclose(arq);
-        free(restante);
-        
-    } else {
-        printf("Erro ao tentar abrir arquivo\n");
-    }
+    fclose(arq);
+    free(restante);
     
     free(ingresso);
     free(duracao);
     free(prioridade);
+    
+    destruirFila(&f);
     
     return 0;
 }
@@ -128,11 +145,9 @@ void enfileirar(Fila *f, int info) {
 
 int desenfileirar(Fila *f) {
     int ret = -1;
-
     ElementoFila *aux = NULL;
 
     if (f->ini != NULL) {
-
         ret = f->ini->info;
         aux = f->ini;
         f->ini = aux->prox;
@@ -141,7 +156,6 @@ int desenfileirar(Fila *f) {
             f->fim = NULL;
         }
         f->num_elems--;
-
     } else {
         printf("Queue Underflow!!!\n");
     }
@@ -157,8 +171,7 @@ void imprimirFila(Fila *f) {
         for (aux = f->ini; aux != NULL; aux = aux->prox){
             printf("%d <- ", aux->info);
         }
-
-    printf("Num. Elems: %d\n", f->num_elems);
+        printf("Num. Elems: %d\n", f->num_elems);
     } else {
         printf("Fila vazia!\n");
     }
