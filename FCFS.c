@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
     f.ini = f.fim = NULL;
     f.num_elems = 0;
     int numTarefas;
-
+    
     scanf("%d", &numTarefas);
 
     int *ingresso = malloc(numTarefas * sizeof(int));
@@ -49,35 +49,68 @@ int main(int argc, char *argv[]){
     for(int i = 0; i < numTarefas; i++) {
         scanf("%d", &prioridade[i]);
     }
+    
+    FILE *arq = fopen("1.out", "w");
+    if(arq == NULL){
+        printf("Erro ao criar o arquivo!\n");
+        return -1;
+    }
 
-    printf("Número de tarefas: %d\n", numTarefas);
-    printf("Ingresso: ");
-    for(int i = 0; i < numTarefas; i++) printf("%d ", ingresso[i]);
-    printf("\nDuração: ");
-    for(int i = 0; i < numTarefas; i++) printf("%d ", duracao[i]);
-    printf("\nPrioridade: ");
-    for(int i = 0; i < numTarefas; i++) printf("%d ", prioridade[i]);
-    printf("\n");
+    if(arq){
+        fprintf(arq, "%s", "FCFS\n");
+        fprintf(arq, "%d\n", numTarefas);
+
+        for(int i = 0; i < numTarefas; i++){
+            fprintf(arq, "%d\n", ingresso[i]);
+        }
+
+        int tempo = 0;
+        int concluidas = 0;
+        int *restante = malloc(numTarefas *sizeof(int));
+    
+        for(int i = 0; i < numTarefas; i++){
+            restante[i] = duracao[i];
+    }
+    
+    while(concluidas < numTarefas){
+        for(int i = 0; i < numTarefas; i++){
+            if(ingresso[i] == tempo)
+            enfileirar(&f, i);
+    }
+    
+    if(f.ini != NULL){
+        int idx = f.ini->info;
+        fprintf(arq, "%d\n", idx + 1);
+            restante[idx]--;
+            
+            if(restante[idx] == 0){
+                desenfileirar(&f);
+                concluidas++;
+            }
+        } else {
+            fprintf(arq, "0\n");
+        }
+        
+        tempo++;
+    }
+
+        fclose(arq);
+        free(restante);
+        
+    } else {
+        printf("Erro ao tentar abrir arquivo\n");
+    }
     
     free(ingresso);
     free(duracao);
     free(prioridade);
-
-    // enfileirar(&f, 'a');
-    // enfileirar(&f, 'b');
-    // enfileirar(&f, 'c');
-    // enfileirar(&f, 'd');
-    // imprimirFila(&f);
-    // desenfileirar(&f);
-    // imprimirFila(&f);
-    // desenfileirar(&f);
-
+    
     return 0;
 }
 
 void enfileirar(Fila *f, int info) {
     ElementoFila *novoElem = novoElemento(info);
-
+    
     if(novoElem == NULL){
         printf("Erro de alocação de memória\n");
         return;
@@ -122,7 +155,7 @@ void imprimirFila(Fila *f) {
     if (f->ini != NULL) {
         aux = f->ini;
         for (aux = f->ini; aux != NULL; aux = aux->prox){
-            printf("%c <- ", aux->info);
+            printf("%d <- ", aux->info);
         }
 
     printf("Num. Elems: %d\n", f->num_elems);
